@@ -12,20 +12,25 @@ const useFirebase = () => {
 
     const [user, setUser] = useState({});
     const [error, setError] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
+
 
     const logInWithGoogle = () => {
         const googleProvider = new GoogleAuthProvider();
+        setIsLoading(true);
         signInWithPopup(auth, googleProvider)
             .then((result) => {
                 setUser(result.user);
             }).catch((error) => {
                 setError(error.message);
-            });
+            }).finally(() => setIsLoading(false));
     }
 
     const logOut = () => {
+        setIsLoading(true);
         signOut(auth)
             .then(() => { })
+            .finally(() => setIsLoading(false));
     }
 
     useEffect(() => {
@@ -35,12 +40,14 @@ const useFirebase = () => {
             } else {
                 setUser({});
             }
+            setIsLoading(false);
         });
         return () => unsubscribed;
     }, [])
 
     return {
         user,
+        isLoading,
         logInWithGoogle,
         logOut
     }
